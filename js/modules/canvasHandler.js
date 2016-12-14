@@ -46,35 +46,41 @@ function canvasHandler (sb) {
 
 
 		function drawController () {
-			if (sb.crowds.toDraw.nonVoters) {
-				var i;
-				var l = sb.crowds.toDraw.parties.length;
-				for (i=0; i<l; i++) {
-					draw(sb.crowds.toDraw.parties[i].offset, sb.crowds.toDraw.parties[i].data);
+
+			var i;
+			var l = sb.crowds.toDraw.length;
+			for (i=0; i<l; i++) {
+				var offset = {
+					x: sb.crowds.toDraw[i].x,
+					y: sb.crowds.toDraw[i].y,
 				}
-				draw(sb.crowds.toDraw.nonVoters.offset, sb.crowds.toDraw.nonVoters.data);
+				draw(offset, sb.crowds.toDraw[i].data);
 			}
 		}
 
 		function draw (offset, data) {
-
+			
 			var i;
-			var l = data.length;
+			var l = data.data.length;
 			for (i=0; i<l; i++) {
 				ctx.beginPath();
 					//context.arc(x-center, y-center, radius, startAngle, endAngle, counterclockwise)
 					//A circle would thus look like:
+					//((d.y + sb.crowds.offset.y) * sb.crowds.multiplier) + sb.h/2
 				ctx.arc(
-						((data[i].x+offset.x)*sb.crowds.multiplier)+sb.crowds.centerOffset.x, //x-pos
-						((data[i].y+offset.y)*sb.crowds.multiplier)+sb.crowds.centerOffset.y, //y-pos
-						(sb.min/5)*sb.crowds.multiplier, //radius
-						0,
-						2 * Math.PI,
-						true
-					);				
-					ctx.fill();
-					ctx.closePath();
-				}
+					((data.data[i].x+sb.crowds.offset.x+offset.x)*sb.crowds.multiplier)+ sb.w/2, //x-pos
+					((data.data[i].y+sb.crowds.offset.y+offset.y)*sb.crowds.multiplier)+ sb.h/2, //y-pos
+					
+
+					(sb.min/5)*sb.crowds.multiplier, //radius
+					0,
+					2 * Math.PI,
+					true
+				);				
+				ctx.fill();
+				ctx.closePath();
+			}
+			
 		}
 
 		function RESIZE () {

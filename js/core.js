@@ -3,7 +3,8 @@ var input = {
 	"canvasHandler",
 	"tooltipHandler",
 	"svgHandler",
-	"svgInteractHandler",
+	"zoomHandler",
+	//"svgInteractHandler",
 	"crowdHandler",
 	"crowdFormatHandler",
 	"dropdownHandler",
@@ -86,11 +87,8 @@ function init () {
 		input: input,
 		resize: [],
 		crowds: {
-			toDraw: {
-				nonVoters: null,
-				spoiled: null, 
-				parties: [],
-			}
+			toDraw: {},
+			offset: {},
 		},
 		min: 1,
 		max: 5,

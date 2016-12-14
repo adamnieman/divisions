@@ -29,7 +29,15 @@ function svgHandler (sb) {
 		var svg = d3.select(container).append("svg")
 		.attr("class", "back")
 		.attr("width", sb.w)
-		.attr("height", sb.h);
+		.attr("height", sb.h)
+		.on("click", function () {
+			if (d3.event.originalTarget == this) {
+				sb.notify({
+					type : "unzoom",
+					data: null,
+				});
+			}
+		});
 
 		//making 2 groups so the key will always sit on top of the circles regardless of when they are added
 		var g1 = svg.append("g");
@@ -76,13 +84,13 @@ function svgHandler (sb) {
 
 		function RECEIVE () {
 			groups = g1.selectAll(".crowd-group")
-			.data(sb.crowds.toDraw.parties.concat(sb.crowds.toDraw.nonVoters))
+			.data(sb.crowds.toDraw)
 			.enter()
 			.append("g")
 			.attr("class", "crowd-group")
 			.attr("transform", function (d, i) {
-				var x = ((d.offset.x*sb.crowds.multiplier)+sb.crowds.centerOffset.x)
-				var y = ((d.offset.y*sb.crowds.multiplier)+sb.crowds.centerOffset.y)
+				var x = ((d.x + sb.crowds.offset.x) * sb.crowds.multiplier) + sb.w/2//sb.crowds.offset.x
+				var y = ((d.y + sb.crowds.offset.y) * sb.crowds.multiplier) + sb.h/2//sb.crowds.offset.x
 				return "translate("+x+","+y+")"
 			})
 
@@ -91,18 +99,33 @@ function svgHandler (sb) {
 			.attr("cx", 0)
 			.attr("cy", 0)
 			.attr("r", function (d, i) {
-				return d.radius * sb.crowds.multiplier;
+				return d.r * sb.crowds.multiplier;
 			})
-			.attr("fill", function (d, i) {
-				if (d.id == "nonVoters") {
-					return sb.getColour(d.id);
+			.attr("fill", "rgba(0,0,0,0)")
+			.attr("stroke-width", sb.fontSize/4)
+			.attr("stroke", function (d, i) {
+				if (d.data.id == "nonVoters") {
+					return sb.getColour(d.data.id);
 				}
-				return utility.adjustColour(sb.getColour(d.id), "l", 0.6, 0.7);
+				return utility.adjustColour(sb.getColour(d.data.id), "l", 0.6, 0.7);
 			})
-			.attr("opacity", 0.75)
+			//.attr("opacity", 0.75)
+			.on("click", function (d, i) {
+				sb.notify({
+					type : "zoom",
+					data: d
+				});
+			})
 			.on("mouseover", function (d, i) {
+
+				d3.select(this)
+				/*.transition()
+				.duration(300)
+				.ease("cubic-in-out")*/
+				.attr("stroke-width", sb.fontSize/2);
+
 				var partyInfo = sb.currentConstituency.candidate.filter(function (a) {
-					if (a.party._value == d.id) {
+					if (a.party._value == d.data.id) {
 						return a;
 					}
 				});
@@ -111,38 +134,38 @@ function svgHandler (sb) {
 
 				if (partyInfo.length > 0) {
 					partyInfo = partyInfo[0];
-					content += "<h3>"+d.id+"</h3>"
+					content += "<h3>"+d.data.id+"</h3>"
 					content += "<p>candidate:\t"+partyInfo.fullName._value+"</p>"
 					content += "<p>votes:\t"+partyInfo.numberOfVotes+"</p>"
 					content += "<p>place:\t"+partyInfo.order+"</p>"
 				} 
-				else if (d.id == "nonVoters") {
-					content += "<p>non voters:\t"+d.data.length+"</p>";
+				else if (d.data.id == "nonVoters") {
+					content += "<p>non voters:\t"+d.data.data.length+"</p>";
 				}
 
 				sb.notify({
 					type : "update-tooltip",
 					data: {
-						x: ((d.offset.x*sb.crowds.multiplier)+sb.crowds.centerOffset.x) +(d.radius* sb.crowds.multiplier)+10,
-						y: ((d.offset.y*sb.crowds.multiplier)+sb.crowds.centerOffset.y),
+						x: ((d.x + sb.crowds.offset.x + d.r) * sb.crowds.multiplier) + sb.w/2+10,
+						y: ((d.y + sb.crowds.offset.y) * sb.crowds.multiplier) + sb.h/2,
 						content: content,
 					}
 				});
 
 			})
 			.on("mouseout", function (d, i) {
+
+				d3.select(this)
+				/*.transition()
+				.duration(300)
+				.ease("cubic-in-out")*/
+				.attr("stroke-width", sb.fontSize/4);
+
 				sb.notify({
 					type : "hide-tooltip",
 					data: null,
 				});
 			})
-
-			/*groups
-			.append("text")
-			.text(function (d, i) {
-				return d.id;
-			})
-			.attr("fill", "white");*/
 		}
 
 		function ERASE () {
@@ -166,14 +189,14 @@ function svgHandler (sb) {
 			if (groups && circles) {
 				groups
 				.attr("transform", function (d, i) {
-					var x = ((d.offset.x*sb.crowds.multiplier)+sb.crowds.centerOffset.x)
-					var y = ((d.offset.y*sb.crowds.multiplier)+sb.crowds.centerOffset.y)
+					var x = ((d.x + sb.crowds.offset.x) * sb.crowds.multiplier) + sb.w/2
+					var y = ((d.y + sb.crowds.offset.y) * sb.crowds.multiplier) + sb.h/2
 					return "translate("+x+","+y+")"
 				})
 
 				circles
 				.attr("r", function (d, i) {
-					return d.radius * sb.crowds.multiplier;
+					return d.r * sb.crowds.multiplier;
 				})
 			}
 

@@ -1,6 +1,7 @@
 function crowdFormatHandler (sb) {
 
-	var container = document.getElementById("vis");
+	//var container = document.getElementById("vis");
+	var padding = sb.fontSize;
 
 	function INIT () {
 		sb.listen({
@@ -16,134 +17,123 @@ function crowdFormatHandler (sb) {
 		})
 
 		sb.resize.push(RESIZE);
+
+		sb.crowds.pack = d3.pack()
+		.radius(function (d) {
+			return d.data.radius
+		})
+		.padding(sb.fontSize)
 	}
 
 	function RESET () {
-		sb.crowds.toDraw.nonVoters = null;
-		sb.crowds.toDraw.spoiled = null;
-		sb.crowds.toDraw.parties = [];
+		sb.crowds.toDraw.children = [];
 	}
 
 	function RECEIVE (d) {
-		//console.log(d);
-		//console.log(sb);
 
-		switch (d.id) {
-			case "nonVoters":
-				sb.crowds.toDraw.nonVoters = {
-					id: d.id,
-					offset: {},
-					data: d.data,
-					radius: 0
-				}
-				break;
-			case "spoiled":
-				sb.crowds.toDraw.spoiled = {
-					id: d.id,
-					offset: {},
-					data: d.data,
-					radius: 0
-				}
-				break;
-			default:
-				sb.crowds.toDraw.parties.push({
-					id: d.id,
-					offset: {},
-					data: d.data,
-					radius: 0
-				})
-		}
+		d.radius = getRadius(d);
+		sb.crowds.toDraw.children.push(d);
 
-
-		if ((sb.crowds.toDraw.parties.length == sb.currentConstituency.candidate.length)&&
-			sb.crowds.toDraw.spoiled != null && sb.crowds.toDraw.nonVoters != null) {
+		if (sb.crowds.toDraw.children.length == sb.currentConstituency.candidate.length + 1) {
 			
-			calculateOffset();
+			sb.crowds.toDraw.children.sort(function(a, b) {
+				//console.log(a)
+				return b.data.length - a.data.length
+				//b-a
+			})
+
+			sb.crowds.toDraw = sb.crowds.pack(d3.hierarchy(sb.crowds.toDraw))
+			sb.crowds.toDraw = sb.crowds.toDraw.children;
+
+
+
+			//calculate sb.crowds.ch(height of circles)
+			var x = [Infinity, -Infinity];
+			var y = [Infinity, -Infinity];
+
+			var i;
+			var l = sb.crowds.toDraw.length;
+			var c;
+			for (i=0; i<l; i++) {
+				c = sb.crowds.toDraw[i];
+				if (c.x-c.r < x[0]) {x[0] = c.x-c.r}
+				if (c.x+c.r > x[1]) {x[1] = c.x+c.r}
+				if (c.y-c.r < y[0]) {y[0] = c.y-c.r}
+				if (c.y+c.r > y[1]) {y[1] = c.y+c.r}
+			}
+
+			sb.crowds.cw = Math.abs(x[1] - x[0])// + sb.fontSize*2;
+			sb.crowds.ch = Math.abs(y[1] - y[0])// + sb.fontSize*2;
+
+			sb.crowds.offset.x = ((sb.crowds.cw/2) - x[1]) //+ sb.fontSize
+			sb.crowds.offset.y = ((sb.crowds.ch/2) - y[1]) //+ sb.fontSize
+
 			getMultiplier();
-			getCenterOffset();
 
 			sb.notify({
 				type : "newCrowd",
-				data: null,
+				data: null
+			});
+
+	        /*var svg = d3.select(container).append("svg")
+			.attr("class", "back")
+			.attr("width", sb.w)
+			.attr("height", sb.h);
+
+			/*var circles = svg.selectAll(".test-circle")
+			.data(sb.crowds.toDraw)
+			.enter()
+			.append("circle")
+			.attr("class", "test-circle")
+			.attr("cx", function (d) {
+				return ((d.x) * sb.crowds.multiplier) + sb.w/2//sb.crowds.offset.x
+			})
+			.attr("cy", function (d) {
+				return ((d.y) * sb.crowds.multiplier) + sb.h/2//sb.crowds.offset.y
+			})
+			.attr("r", function (d) {
+				return d.r * sb.crowds.multiplier;
 			})
 
-			//drawController();
+			var circles2 = svg.selectAll(".test-circle-2")
+			.data(sb.crowds.toDraw)
+			.enter()
+			.append("circle")
+			.attr("class", "test-circle-2")
+			.attr("cx", function (d) {
+				return ((d.x + sb.crowds.offset.x) * sb.crowds.multiplier) + sb.w/2//sb.crowds.offset.x
+			})
+			.attr("cy", function (d) {
+
+				//console.log(((d.y + sb.crowds.offset.y)));
+				return ((d.y + sb.crowds.offset.y) * sb.crowds.multiplier) + sb.h/2//sb.crowds.offset.y
+			})
+			.attr("r", function (d) {
+				return d.r * sb.crowds.multiplier
+			})
+			.attr("fill", "none")
+			.attr("stroke", "grey")
+			.attr("stroke-width", 3);*/
+			
 		}
 	}
 
-	function calculateOffset () {
-		//the angle apart the crowds will be from each other around the edge of the circle
-		var angleEach = (2*Math.PI)/sb.crowds.toDraw.parties.length; //in radians
-
-		//the radius of the largest crowd
-		var largest = 0;
-			
-		//calculates the approx radius of each crowd, and assigns the largest one to longest
-		var i;
-		var l = sb.crowds.toDraw.parties.length;
-		for (i=0; i<l; i++) {
-			sb.crowds.toDraw.parties[i].radius = Math.abs(utility.arrayMax(sb.crowds.toDraw.parties[i].data, "x")-utility.arrayMin(sb.crowds.toDraw.parties[i].data, "x"))/2;
-			if (sb.crowds.toDraw.parties[i].radius > largest) {
-				largest = sb.crowds.toDraw.parties[i].radius;
-			}
-		}
-
-		//gets the distance that the circles will have to be away from the center of the "mother" circle so as to not overlap
-		motherRadius = (largest*2.4)/(2*Math.tan(angleEach/2))
-		//gets the outer radius of the entire 'parties' group. this is the radius of the mother circle plus the radius of the biggest crowd.
-		outerRadius = largest+motherRadius;
-		padding = outerRadius/10;
-		
-		//gives each crowd an x, y center co-ordinate based on bearing (angle from the top) and radius of mother circle.
-		for (i=0; i<l; i++) {
-			var angle = i*angleEach;
-			sb.crowds.toDraw.parties[i].offset = {
-				x: (motherRadius*Math.cos(angle))+(outerRadius)+padding,
-				y: motherRadius*Math.sin(angle)+(outerRadius)+padding,
-			}
-		}
-
-		sb.crowds.toDraw.nonVoters.radius = Math.abs(utility.arrayMax(sb.crowds.toDraw.nonVoters.data, "x")-utility.arrayMin(sb.crowds.toDraw.nonVoters.data, "x"))/2;
-		sb.crowds.toDraw.nonVoters.offset = {
-			x: (outerRadius*2)+(padding*2)+(sb.crowds.toDraw.nonVoters.radius),
-			y: (outerRadius) > (sb.crowds.toDraw.nonVoters.radius) ? (outerRadius)+padding : (sb.crowds.toDraw.nonVoters.radius)+padding, 
-		}
-
-		sb.crowds.cw = (outerRadius*2)+(sb.crowds.toDraw.nonVoters.radius*2)+(padding*3)
-		sb.crowds.ch = sb.crowds.toDraw.nonVoters.offset.y * 2;
-
+	function getRadius (d) {
+		return Math.abs(utility.arrayMax(d.data, "x")-utility.arrayMin(d.data, "x"))/2;
 	}
 
 	function getMultiplier () {
-		sb.crowds.multiplier = sb.h/sb.crowds.ch > sb.w/sb.crowds.cw ? sb.w/sb.crowds.cw : sb.h/sb.crowds.ch;
+		sb.crowds.multiplier = (sb.h-(padding*2))/sb.crowds.ch > (sb.w-(padding*2))/sb.crowds.cw ? (sb.w-(padding*2))/sb.crowds.cw : (sb.h-(padding*2))/sb.crowds.ch;
 		sb.crowds.multiplier = utility.round(sb.crowds.multiplier, 2);
 		debug.dbg("The multiplier is: "+sb.crowds.multiplier)
-
-	}
-
-	function getCenterOffset () {
-		sb.crowds.centerOffset = {};
-
-		if (sb.h/sb.crowds.ch > sb.w/sb.crowds.cw) {
-			sb.crowds.centerOffset.x = 0;
-			sb.crowds.centerOffset.y = (sb.h-(sb.crowds.ch*sb.crowds.multiplier))/2;
-		}
-		else {
-			sb.crowds.centerOffset.x = (sb.w-(sb.crowds.cw*sb.crowds.multiplier))/2;
-			sb.crowds.centerOffset.y = 0;
-		}
 	}
 
 
 	function RESIZE () {
 		if (sb.currentConstituency &&
-			(sb.crowds.toDraw.parties.length == sb.currentConstituency.candidate.length)&&
-			sb.crowds.toDraw.spoiled != null && sb.crowds.toDraw.nonVoters != null) {
+			(sb.crowds.toDraw.length == sb.currentConstituency.candidate.length+1)) {
 			
 			getMultiplier();
-			getCenterOffset();
-
-			
 		}
 
 		sb.notify({

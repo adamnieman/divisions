@@ -42,21 +42,22 @@
 		d=d.data.result.primaryTopic;
 		sb.currentConstituency = d;
 
-		var crowdsToGet = {
-			nonVoters: d.electorate-d.turnout,
-			spoiled: d.turnout, 
-		}
+		var crowdsToGet = [{id: "nonVoters", size: d.electorate-d.turnout}];
 
 		var i;
 		var l = d.candidate.length;
+
 		for (i=0; i<l; i++) {
-			crowdsToGet.spoiled -= d.candidate[i].numberOfVotes;
-			crowdsToGet[d.candidate[i].party._value] = d.candidate[i].numberOfVotes;
+			crowdsToGet.push({
+				id: d.candidate[i].party._value,
+				size: d.candidate[i].numberOfVotes
+			})
 		}
 
-		for (var propt in crowdsToGet) {
+		l=crowdsToGet.length
+		for (i=0; i<l; i++) {
 			notify(crowdUrlRoot+"value="+sb.min+" "+sb.max+" "+
-				crowdsToGet[propt], propt);
+				crowdsToGet[i].size, crowdsToGet[i].id);
 		}
 	}
 

@@ -24,7 +24,7 @@ svg.back {
     /*display: none;
     pointer-events: all;
     mix-blend-mode: multiply;*/
-    z-index: -1;
+    z-index: 1;
 }
 
 svg.front {

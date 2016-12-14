@@ -1,5 +1,5 @@
 var debug = {
-	on: false,
+	on: !false,
 	trace: true,
 };
 
