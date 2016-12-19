@@ -6,7 +6,7 @@ html {
 }
 
 #vis {
-    position: absolute;
+    position: absolute; 
     width: 100%;
     height: 100%;
 }
@@ -20,14 +20,10 @@ canvas {
     z-index: 0;
 }
 
-svg.back {
+svg {
     /*display: none;
-    pointer-events: all;
-    mix-blend-mode: multiply;*/
-    z-index: 1;
-}
-
-svg.front {
+    pointer-events: all;*/
+    mix-blend-mode: multiply;
     z-index: 1;
 }
 

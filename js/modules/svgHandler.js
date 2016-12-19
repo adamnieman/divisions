@@ -27,7 +27,6 @@ function svgHandler (sb) {
 		var container = document.getElementById("vis");
 
 		var svg = d3.select(container).append("svg")
-		.attr("class", "back")
 		.attr("width", sb.w)
 		.attr("height", sb.h)
 		.on("click", function () {
@@ -117,7 +116,7 @@ function svgHandler (sb) {
 				});
 			})
 			.on("mouseover", function (d, i) {
-
+				console.log(d, sb.currentConstituency.candidate[0])
 				d3.select(this)
 				/*.transition()
 				.duration(300)
@@ -125,10 +124,14 @@ function svgHandler (sb) {
 				.attr("stroke-width", sb.fontSize/2);
 
 				var partyInfo = sb.currentConstituency.candidate.filter(function (a) {
-					if (a.party._value == d.data.id) {
+					if (a.party._value == d.data.id &&
+						d.data.data.length == a.numberOfVotes) {
 						return a;
 					}
 				});
+
+				//console.log(d.data.id, d.data.data.length)
+				//console.log(partyInfo);
 
 				var content = "";
 

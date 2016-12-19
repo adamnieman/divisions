@@ -18,8 +18,8 @@ function constituencyHandler (sb) {
 	
 	function REQUEST (d) {
 		d = d || sb.dataUrlRoot+"electionresults.json?";
-		//d = d+"&&_pageSize=500";
-		d = d+"&&_pageSize=10"
+		d = d+"&&_pageSize=500";
+		//d = d+"&&_pageSize=10"
 
 		sb.notify({
 			type : "httpGet",
@@ -35,7 +35,7 @@ function constituencyHandler (sb) {
 
 		d = d.data.result;
 		sb.constits = sb.constits.concat(d.items);
-		if ((d.startIndex + d.itemsPerPage) <= 30/*d.totalResults*/) {
+		if ((d.startIndex + d.itemsPerPage) <= /*30*/d.totalResults) {
 			REQUEST(d.next)
 		}
 		else {
