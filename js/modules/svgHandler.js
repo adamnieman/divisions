@@ -72,9 +72,6 @@ function svgHandler (sb) {
 		.append("text")
 		.attr("opacity", 0.75)
 		.text(function (d) {
-			if (d === "nonVoters") {
-				return "non voters";
-			}
 			return d;
 		})
 		.attr("x", - (sb.fontSize+keyPad))
@@ -83,11 +80,13 @@ function svgHandler (sb) {
 
 		function RECEIVE () {
 			groups = g1.selectAll(".crowd-group")
-			.data(sb.crowds.toDraw)
+			.data(sb.currentConstituency.parties)
 			.enter()
 			.append("g")
 			.attr("class", "crowd-group")
 			.attr("transform", function (d, i) {
+				//var x = d.x+sb.w/2; //x-pos
+				//var y = d.y+sb.h/2;
 				var x = ((d.x + sb.crowds.offset.x) * sb.crowds.multiplier) + sb.w/2//sb.crowds.offset.x
 				var y = ((d.y + sb.crowds.offset.y) * sb.crowds.multiplier) + sb.h/2//sb.crowds.offset.x
 				return "translate("+x+","+y+")"
@@ -103,10 +102,10 @@ function svgHandler (sb) {
 			.attr("fill", "rgba(0,0,0,0)")
 			.attr("stroke-width", sb.fontSize/4)
 			.attr("stroke", function (d, i) {
-				if (d.data.id == "nonVoters") {
-					return sb.getColour(d.data.id);
+				if (d.name == "non voters") {
+					return sb.getColour(d.name);
 				}
-				return utility.adjustColour(sb.getColour(d.data.id), "l", 0.6, 0.7);
+				return utility.adjustColour(sb.getColour(d.name), "l", 0.6, 0.7);
 			})
 			//.attr("opacity", 0.75)
 			.on("click", function (d, i) {
@@ -116,34 +115,19 @@ function svgHandler (sb) {
 				});
 			})
 			.on("mouseover", function (d, i) {
-				console.log(d, sb.currentConstituency.candidate[0])
 				d3.select(this)
-				/*.transition()
-				.duration(300)
-				.ease("cubic-in-out")*/
 				.attr("stroke-width", sb.fontSize/2);
-
-				var partyInfo = sb.currentConstituency.candidate.filter(function (a) {
-					if (a.party._value == d.data.id &&
-						d.data.data.length == a.numberOfVotes) {
-						return a;
-					}
-				});
-
-				//console.log(d.data.id, d.data.data.length)
-				//console.log(partyInfo);
 
 				var content = "";
 
-				if (partyInfo.length > 0) {
-					partyInfo = partyInfo[0];
-					content += "<h3>"+d.data.id+"</h3>"
-					content += "<p>candidate:\t"+partyInfo.fullName._value+"</p>"
-					content += "<p>votes:\t"+partyInfo.numberOfVotes+"</p>"
-					content += "<p>place:\t"+partyInfo.order+"</p>"
-				} 
-				else if (d.data.id == "nonVoters") {
-					content += "<p>non voters:\t"+d.data.data.length+"</p>";
+				if (d.name == "non voters") {
+					content += "<p>non voters:\t"+d.votes+"</p>";
+				}
+				else {
+					content += "<h3>"+d.name+"</h3>"
+					content += "<p>candidate:\t"+d.candidate+"</p>"
+					content += "<p>votes:\t"+d.votes+"</p>"
+					content += "<p>place:\t"+d.place+"</p>"
 				}
 
 				sb.notify({
@@ -159,9 +143,6 @@ function svgHandler (sb) {
 			.on("mouseout", function (d, i) {
 
 				d3.select(this)
-				/*.transition()
-				.duration(300)
-				.ease("cubic-in-out")*/
 				.attr("stroke-width", sb.fontSize/4);
 
 				sb.notify({

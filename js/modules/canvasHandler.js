@@ -48,29 +48,27 @@ function canvasHandler (sb) {
 		function drawController () {
 
 			var i;
-			var l = sb.crowds.toDraw.length;
+			var l = sb.currentConstituency.parties.length;
 			for (i=0; i<l; i++) {
 				var offset = {
-					x: sb.crowds.toDraw[i].x,
-					y: sb.crowds.toDraw[i].y,
+					x: sb.currentConstituency.parties[i].x,
+					y: sb.currentConstituency.parties[i].y,
 				}
-				draw(offset, sb.crowds.toDraw[i].data);
+				draw(offset, sb.currentConstituency.parties[i].crowd);
 			}
 		}
 
 		function draw (offset, data) {
-			
 			var i;
-			var l = data.data.length;
+			var l = data.length;
 			for (i=0; i<l; i++) {
 				ctx.beginPath();
 					//context.arc(x-center, y-center, radius, startAngle, endAngle, counterclockwise)
 					//A circle would thus look like:
 					//((d.y + sb.crowds.offset.y) * sb.crowds.multiplier) + sb.h/2
 				ctx.arc(
-					((data.data[i].x+sb.crowds.offset.x+offset.x)*sb.crowds.multiplier)+ sb.w/2, //x-pos
-					((data.data[i].y+sb.crowds.offset.y+offset.y)*sb.crowds.multiplier)+ sb.h/2, //y-pos
-					
+					((data[i].x+sb.crowds.offset.x+offset.x)*sb.crowds.multiplier)+ sb.w/2, //x-pos
+					((data[i].y+sb.crowds.offset.y+offset.y)*sb.crowds.multiplier)+ sb.h/2, //y-pos
 
 					(sb.min/5)*sb.crowds.multiplier, //radius
 					0,

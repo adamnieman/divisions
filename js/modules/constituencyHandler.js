@@ -17,7 +17,7 @@ function constituencyHandler (sb) {
 	}
 	
 	function REQUEST (d) {
-		d = d || sb.dataUrlRoot+"electionresults.json?";
+		d = d || sb.dataUrlRoot+"electionresults.json?election.label=2015+General+Election";
 		d = d+"&&_pageSize=500";
 		//d = d+"&&_pageSize=10"
 

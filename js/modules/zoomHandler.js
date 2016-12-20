@@ -1,6 +1,7 @@
 function zoomHandler (sb) {
 
 	var zoomed = false;
+	var current;
 	var offset = {
 		x: null,
 		y: null,
@@ -47,6 +48,13 @@ function zoomHandler (sb) {
 	}
 
 	function ZOOM (d) {
+		
+		if (current == d.candidate) {
+			UNZOOM ();
+			return;
+		}
+
+		current = d.candidate;
 		//the diameter of the minimum vsible region around the centerpoint of the selected group
 		var diameter = (d.r+sb.fontSize)*2;
 

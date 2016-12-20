@@ -1,6 +1,6 @@
 var input = {
 	scripts: [
-	"canvasHandler",
+	"canvasHandler", //make this work next!!!!! please.
 	"tooltipHandler",
 	"svgHandler",
 	"zoomHandler",
@@ -87,7 +87,6 @@ function init () {
 		input: input,
 		resize: [],
 		crowds: {
-			toDraw: {},
 			offset: {},
 		},
 		min: 1,

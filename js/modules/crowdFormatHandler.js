@@ -2,6 +2,7 @@ function crowdFormatHandler (sb) {
 
 	//var container = document.getElementById("vis");
 	var padding = sb.fontSize;
+	var returnCount = 0;
 
 	function INIT () {
 		sb.listen({
@@ -20,22 +21,71 @@ function crowdFormatHandler (sb) {
 
 		sb.crowds.pack = d3.pack()
 		.radius(function (d) {
-			return d.data.radius
+			return d.data.r
 		})
 		.padding(sb.fontSize)
 	}
 
 	function RESET () {
-		sb.crowds.toDraw.children = [];
+
 	}
 
 	function RECEIVE (d) {
 
+		var party = sb.currentConstituency.parties.filter(function (a) {
+			return a.id == d.id;
+		})
+		party = party[0];
+		party.add_crowd(d.data);
+		returnCount++;
+
+		if (returnCount == sb.currentConstituency.parties_count+1) {
+			
+			returnCount = 0;
+
+			var packed = sb.crowds.pack(d3.hierarchy({children: sb.currentConstituency.parties})).children;
+			
+			var x = [Infinity, -Infinity];
+			var y = [Infinity, -Infinity];
+
+			var i;
+			var c;
+			var l = packed.length;
+
+			for (i=0; i<l; i++) {
+
+				sb.currentConstituency.parties[i].x = packed[i].x;
+				sb.currentConstituency.parties[i].y = packed[i].y;
+				c = sb.currentConstituency.parties[i];
+
+				if (c.x-c.r < x[0]) {x[0] = c.x-c.r}
+				if (c.x+c.r > x[1]) {x[1] = c.x+c.r}
+				if (c.y-c.r < y[0]) {y[0] = c.y-c.r}
+				if (c.y+c.r > y[1]) {y[1] = c.y+c.r}
+			}
+
+			sb.crowds.cw = Math.abs(x[1] - x[0])// + sb.fontSize*2;
+			sb.crowds.ch = Math.abs(y[1] - y[0])// + sb.fontSize*2;
+
+			sb.crowds.offset.x = ((sb.crowds.cw/2) - x[1]) //+ sb.fontSize
+			sb.crowds.offset.y = ((sb.crowds.ch/2) - y[1]) //+ sb.fontSize
+
+			getMultiplier();
+
+			sb.notify({
+				type : "newCrowd",
+				data: null
+			});
+		}
+		
+
+		/*
 		d.radius = getRadius(d);
 		sb.crowds.toDraw.children.push(d);
 
 		if (sb.crowds.toDraw.children.length == sb.currentConstituency.candidate.length + 1) {
-			
+			console.log(sb.crowds);
+			console.log(sb.currentConstituency);
 			sb.crowds.toDraw.children.sort(function(a, b) {
 				//console.log(a)
 				return b.data.length - a.data.length
@@ -113,13 +163,9 @@ function crowdFormatHandler (sb) {
 			})
 			.attr("fill", "none")
 			.attr("stroke", "grey")
-			.attr("stroke-width", 3);*/
+			.attr("stroke-width", 3);
 			
-		}
-	}
-
-	function getRadius (d) {
-		return Math.abs(utility.arrayMax(d.data, "x")-utility.arrayMin(d.data, "x"))/2;
+		}*/
 	}
 
 	function getMultiplier () {
@@ -130,8 +176,7 @@ function crowdFormatHandler (sb) {
 
 
 	function RESIZE () {
-		if (sb.currentConstituency &&
-			(sb.crowds.toDraw.length == sb.currentConstituency.candidate.length+1)) {
+		if (sb.currentConstituency && sb.crowds.multiplier) {
 			
 			getMultiplier();
 		}

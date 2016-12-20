@@ -40,8 +40,26 @@
 
 	function RECEIVE (d) {
 		d=d.data.result.primaryTopic;
-		sb.currentConstituency = d;
+		sb.currentConstituency = new index.Constituency(d.constituency.label._value, d.electorate, d.candidate.length);
 
+		//console.log(sb.currentConstituency);
+		debug.check("Failed to initialise constituency "+d.constituency.label._value, sb.currentConstituency.init)
+
+		var i;
+		var l = sb.currentConstituency.parties_count;
+		var crowdsToGet = [];
+
+		for (i=0; i<l; i++) {
+			var party = d.candidate[i];
+			sb.currentConstituency.add_party(party.party._value, party.fullName._value, party.numberOfVotes);
+		}
+
+		l++;
+		for (i=0; i<l; i++) {
+			notify(crowdUrlRoot+"value="+sb.min+" "+sb.max+" "+
+				sb.currentConstituency.parties[i].votes, sb.currentConstituency.parties[i].id);
+		}
+		/*
 		var crowdsToGet = [{id: "nonVoters", size: d.electorate-d.turnout}];
 
 		var i;
@@ -58,7 +76,7 @@
 		for (i=0; i<l; i++) {
 			notify(crowdUrlRoot+"value="+sb.min+" "+sb.max+" "+
 				crowdsToGet[i].size, crowdsToGet[i].id);
-		}
+		}*/
 	}
 
 	function notify (url, id) {

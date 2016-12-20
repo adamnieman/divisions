@@ -4,15 +4,26 @@ html {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     color: #638795;
 }
+#election {
+    height: 4rem;
+}
 
 #vis {
     position: absolute; 
     width: 100%;
-    height: 100%;
+    height: calc(100% - 4rem);
 }
 
 canvas, svg {
     position: absolute;
+}
+
+h1 {
+    /*color: #053b50;*/
+    font-size: 3rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 0.5rem;
 }
 
 canvas {
