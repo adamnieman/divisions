@@ -1,5 +1,6 @@
 <html>
 <head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF8">
 	<link rel="stylesheet" type="text/css" href="css/reset.css">
 	<link rel="stylesheet" type="text/css" href="css/desktop.css">
 	<script src = "js/libs/d3.js"></script>

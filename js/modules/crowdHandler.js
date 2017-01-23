@@ -12,11 +12,20 @@ function crowdHandler (sb) {
 	}
 
 	function REQUESTCROWDDATA () {
+		if (!sb.bill) {
+			sb.notify({
+				type : "stop-load",
+				data: null,
+			})
+			return;
+		}
+
 		var votes = sb.bill.getVotes();
 
 		for (var propt in votes) {
 			if (votes[propt].count > 0) {
 				
+				//first attempt with random crowds:
 				/*var c = crowdsBetween(
 					votes[propt].count,
 					sb.lobbies[propt].x,
@@ -25,13 +34,40 @@ function crowdHandler (sb) {
 					propt == "abstain" ? sb.lobbies[propt].y+sb.lobbies[propt].h : sb.lobbies[propt].y+((sb.lobbies[propt].h/sb.totalMPs)*votes[propt].count)
 				)*/
 
-				var c = generateCoords().square({
+				//second attempt with calculate crowds
+				/*var c = generateCoords().square({
 					x: sb.lobbies[propt].x,
 					w: sb.lobbies[propt].w,
 					y: sb.lobbies[propt].y,
 					h: propt == "abstain" ? sb.lobbies[propt].h : ((sb.lobbies[propt].h/sb.totalMPs)*votes[propt].count)
 				
+				}, votes[propt].count)*/
+
+				var height = sb.lobbies[propt].h;
+
+
+				var compare = null;
+				if (propt == "aye") {
+					compare = "no";
+				}
+				else if (propt == "no") {
+					compare = "aye";
+				}
+
+				if (compare) {
+					if (votes[propt].count < votes[compare].count) {
+						height = (sb.lobbies[propt].h/votes[compare].count)*votes[propt].count;
+					}
+				}
+
+
+				var c = SQUARE({
+					x: sb.lobbies[propt].x,
+					w: sb.lobbies[propt].w,
+					y: sb.lobbies[propt].y,
+					h: height,
 				}, votes[propt].count)
+
 
 				var crowd = new index.Crowd(c);
 				crowd.sort();
@@ -82,7 +118,9 @@ function crowdHandler (sb) {
 		return points;
 	}	
 
-	function generateCoords () {
+	/*function generateCoords () {
+
+		debug,dbg("Hello testing 1 2 3")
 		
 		var recursions = 30;
 		
@@ -95,6 +133,8 @@ function crowdHandler (sb) {
 		//density = {points: , sqUnits: }
 		
 		function SQUARE (dimensions, numPoints) {
+
+			debug.dbg("Number of points: "+numPoints);
 			
 			dimensions.x = dimensions.x ? dimensions.x : 0
 			dimensions.y = dimensions.y ? dimensions.y : 0
@@ -105,6 +145,127 @@ function crowdHandler (sb) {
 			numPoints = Math.round(numPoints);
 			var pointArray = []
 			
+			var numRowsAndCols = Math.round(Math.cbrt(numPoints))
+			
+			
+			
+			var grid = {}
+			
+			for (var i = 0; i < numRowsAndCols; i++){
+				grid[i] = {
+					lowerBound: dimensions.y + (dimensions.h/numRowsAndCols)*i,
+					upperBound: dimensions.y + (dimensions.h/numRowsAndCols)*(i+1)
+				}
+				for (var m = 0; m < numRowsAndCols; m++) {
+					grid[i][m] = {
+						lowerBound: dimensions.x + (dimensions.w/numRowsAndCols)*m,
+						upperBound: dimensions.x + (dimensions.w/numRowsAndCols)*(m+1),
+						points: []
+					}
+				}
+			}
+			
+			for (var i = 0; i < numPoints; i++){
+				
+				var point;
+				
+				var ref = {
+					row: 0,
+					col: 0
+				}
+				
+				var maxDistance = -Infinity; 
+				
+				
+				for (var m = 0; m < recursions; m++){
+					var p = {
+						x: dimensions.x + Math.random()*dimensions.w,
+						y: dimensions.y + Math.random()*dimensions.h
+					}
+					
+					var minDistance = Infinity;
+					
+					var k = 0;
+					while (p.y > grid[k].upperBound) {
+						k++
+					}
+					
+					var l = 0;
+					while (p.x > grid[k][l].upperBound){
+						l++
+					}
+					
+					checkDistanceAgainst = []
+					
+					for (var n = -1; n < 2; n++){
+						for (var q = -1; q < 2; q++){
+							if (grid[k+n]){
+								if (grid[k+n][l+q]){
+									checkDistanceAgainst = checkDistanceAgainst.concat(grid[k+n][l+q].points)
+								}
+							}
+						}
+					}
+					
+					for (var n = 0; n < checkDistanceAgainst.length; n++){
+						var distance = Math.dist(p.x, p.y, checkDistanceAgainst[n].x, checkDistanceAgainst[n].y)
+						minDistance = distance < minDistance ? distance : minDistance
+					}
+					
+					if (minDistance > maxDistance){
+						point = p;
+						ref.row = k,
+						ref.col = l,
+						maxDistance = minDistance;
+					}
+					
+				}
+				
+				grid[ref.row][ref.col].points.push(point)
+				
+			}
+			
+			var k = 0
+			while (grid[k]){
+				var l = 0
+				while (grid[k][l]) {
+					pointArray = pointArray.concat(grid[k][l].points)
+					l++
+				}
+				k++
+			}
+			
+			return pointArray
+		}
+		
+		function CIRCLE () {
+			
+		}
+		
+		return {
+			square: SQUARE,
+			circle: CIRCLE
+		}
+	};*/
+
+	Math.dist=function(x1,y1,x2,y2){ 
+		  if(!x2) x2=0; 
+		  if(!y2) y2=0;
+		  return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)); 
+		}
+
+	function SQUARE (dimensions, numPoints) {
+
+			var recursions = 30;
+
+			dimensions.x = dimensions.x ? dimensions.x : 0
+			dimensions.y = dimensions.y ? dimensions.y : 0
+			
+			//density = density.points/density.sqUnits //gives the number of units per person
+			
+			var area = dimensions.w * dimensions.h
+			numPoints = Math.round(numPoints);
+			var pointArray = []
 			var numRowsAndCols = Math.round(Math.cbrt(numPoints))
 			
 			/*grid = {
@@ -207,16 +368,6 @@ function crowdHandler (sb) {
 			
 			return pointArray
 		}
-		
-		function CIRCLE () {
-			
-		}
-		
-		return {
-			square: SQUARE,
-			circle: CIRCLE
-		}
-	};
 
 	function DESTROY () {
 		sb.unlisten(this.moduleID)

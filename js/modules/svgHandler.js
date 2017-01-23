@@ -25,7 +25,7 @@ function svgHandler (sb) {
 		var M = "M55.7,37.9c-0.1-8.4-5.1-13.1-13.6-13.3c-2.8-0.1-5.6-0.1-8.5-0.1v-3.4c3.3-1.9,5.5-5.4,5.5-9.7C39.1,5,34-0.1,27.8,0c-6.3,0-11.5,5.1-11.5,11.3c0,4,2,7.5,5.1,9.5v3.7c-2.4,0-4.9,0.1-7.3,0.1C5,24.8,0.2,29.5,0,38.5c-0.2,11.7,0.1,23.3-0.1,35c0,3.7,2.1,4.8,4.9,4.8c2.9,0,5.5-0.8,5.3-4.9c-0.3-6.5-0.1-13-0.1-19.5c0-3.3-0.1-6.7,0.1-10c0.1-0.8,1.3-1.5,2-2.3c0.6,0.8,1.6,1.5,1.8,2.4c0.3,1.3,0.1,2.7,0.1,4c0,28.3,0,56.7,0,85c0,6.4,1.1,7.6,6.2,7.6c5.7,0,5.5-3.7,5.5-7.8c-0.2-15.3-0.1-30.7-0.1-46c0-1.5-0.1-3.1,0.3-4.5c0.3-0.8,1.4-1.7,2.3-1.9c0.4-0.2,1.6,1,1.8,1.8c0.4,1.5,0.3,3,0.3,4.5c0.1,16,0.2,32,0,48c0,4.1,1.6,5.8,5.5,5.8c4,0,6.4-1.1,6.3-6C41.8,120,42,105.5,42,91c0-15-0.1-30-0.1-45.1c0-1.5,1.2-2.9,1.8-4.4c0.7,1.5,2,2.9,2,4.3c0.1,9.3,0.2,18.7,0,28c0,4,2.7,4.4,5.3,4.4c2.4,0,4.8-0.7,4.8-4.3C55.7,61.9,56,49.9,55.7,37.9z"
 
 		var container = document.getElementById("vis");
-		var padding = sb.fontSize*2;
+		var padding = sb.fontSize*4;
 
 		var data;
 
@@ -95,6 +95,7 @@ function svgHandler (sb) {
 			.enter()
             .append("g")
             .attr("transform", function (d, i) {
+            	//console.log(d);
             	return "translate("+d.x+","+d.y+")";
             })
 
@@ -117,7 +118,7 @@ function svgHandler (sb) {
             })
             .attr("transform", function (d, i) {
             	var bbox = this.getBBox();
-            	var intendedHeight = 2*sb.fontSize;
+            	var intendedHeight = 2.5*sb.fontSize;
             	var ratio = intendedHeight/bbox.height;
 
             	//translate x and translate y
@@ -131,8 +132,18 @@ function svgHandler (sb) {
 				if (!d.vote) return "black";
 				return sb.getColour(d.vote.getParty());
 			})
-			.attr("stroke", "white")
-			.attr("stroke-width", 2)
+			.attr("stroke", function (d, i) {
+				if (d.vote && d.vote.getParty() == "Scottish National Party") {
+					return "#d39a00"
+				}
+				else return "white"
+			})
+			.attr("stroke-width", function (d, i) {
+				if (d.vote && d.vote.getParty() == "Scottish National Party") {
+					return 5
+				}
+				else return 2
+			})
 			.on("mouseover", function (d, i) {
 				d3.select(this)
 				.attr("stroke", "black")
@@ -160,8 +171,18 @@ function svgHandler (sb) {
 			})
 			.on("mouseout", function (d, i) {
 				d3.select(this)
-				.attr("stroke", "white")
-				.attr("stroke-width", 2);
+				.attr("stroke", function (d, i) {
+					if (d.vote && d.vote.getParty() == "Scottish National Party") {
+						return "#d39a00"
+					}
+					else return "white"
+				})
+				.attr("stroke-width", function (d, i) {
+					if (d.vote && d.vote.getParty() == "Scottish National Party") {
+						return 5
+					}
+					else return 2
+				})
 
 				sb.notify({
 					type : "hide-tooltip",
@@ -242,7 +263,17 @@ function svgHandler (sb) {
 			.attr("width", sb.w)
 			.attr("height", sb.h);
 
-			
+			RESET ();
+
+			sb.notify({
+				type : "start-load",
+				data: null,
+			})
+
+			sb.notify({
+				type : "get-crowds",
+				data: null,
+			})
 		}
 
 		function _DESTROY () {

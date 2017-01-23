@@ -1,6 +1,8 @@
 function billHandler (sb) {
 
 	var bills = document.getElementsByClassName("bill");
+	var clickReceptive = true;
+	//clickReceptive is false if a set of data is currently loading - a new bill visualisation can only be requested once the previous one is returned.
 
 	function INIT () {
 
@@ -15,27 +17,44 @@ function billHandler (sb) {
 			moduleID: this.moduleID,
 			moduleFunction: "receiveBillData",
 		})
+
+		sb.listen({
+			listenFor: ["stop-load"],
+			moduleID: this.moduleID,
+			moduleFunction: "makeReceptive",
+		})
+	}
+
+	function MAKERECEPTIVE () {
+		clickReceptive = true;
 	}
 
 	function makeRequest () {
-		var url = this.getAttribute("value");
-		
-		if(debug.check(url, "No url assoiated with this bill - unable to make data request")){
-			return;
-		}
-
-		sb.notify({
-			type : "start-load",
-			data: null,
-		})
-
-		sb.notify({
-			type : "httpGet",
-			data: {
-				url: url,
-				responseType: "bill-data-return",
+		if (clickReceptive) {
+			var url = this.getAttribute("value");
+			
+			if(debug.check(url, "No url assoiated with this bill - unable to make data request")){
+				return;
 			}
-		})
+
+			utility.removeCurrentClassInstance(bills, "active");
+			utility.addClass(this, "active")
+
+			clickReceptive = false;
+
+			sb.notify({
+				type : "start-load",
+				data: null,
+			})
+
+			sb.notify({
+				type : "httpGet",
+				data: {
+					url: url,
+					responseType: "bill-data-return",
+				}
+			})
+		}
 	}
 	
 	function DESTROY () {
@@ -74,6 +93,7 @@ function billHandler (sb) {
 	return {
         init : INIT,
         receiveBillData: RECIEVEBILLDATA,
+        makeReceptive: MAKERECEPTIVE,
         destroy : DESTROY
     };
 }

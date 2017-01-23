@@ -11,10 +11,12 @@ debug.log = function (string) {
 	console.log("%c[LOG] "+string+"%c"+this.getLine(new Error), "color: #06a800", "color: #bbbbbb");
 }
 
-debug.sentinel = function (bool, string) {
+debug.sentinel = function (bool, string, print) {
+
+	print = print == undefined ? true : print;
 
 	if (!bool) {
-		console.log("%c[ERROR] "+string+"%c"+this.getLine(new Error), "color: #ff6600", "color: #bbbbbb");
+		if (print == true) {console.log("%c[ERROR] "+string+"%c"+this.getLine(new Error), "color: #ff6600", "color: #bbbbbb");}
 		return true;
 	}
 	else {

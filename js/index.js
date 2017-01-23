@@ -19,7 +19,7 @@ index.MpDatabase = function (_path) {
 			return (d.firstName+" "+d.lastName).toLowerCase() === _name.toLowerCase();
 		})
 
-		if (debug.sentinel(result.length == 1, "No match for MP '"+_name+"' in database.")) {
+		if (debug.sentinel(result.length == 1, "No match for MP '"+_name+"' in database.", false)) {
 			return;
 		}
 

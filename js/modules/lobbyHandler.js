@@ -9,12 +9,20 @@ function lobbyHandler (sb) {
 
 	function SETUP (d) {
 
-		var padding = sb.fontSize*2;
+		var padding = sb.fontSize*4;
 		var lobbyWidth, lobbyGroupHeight, lobbyHeight;
 
 		calcLobbyDimens()
 
-		var results = ["aye", "no"];
+		var results = ["AYE", "NO"];
+
+		var bg = d
+		.append("rect")
+		.attr("x", 0)
+		.attr("y", 0)
+		.attr("width", sb.w)
+		.attr("height", sb.h)
+		.attr("fill", "#eee");
 
 		var lobbyGroups = d.selectAll(".lobby-group")
 		.data(results)
@@ -58,18 +66,18 @@ function lobbyHandler (sb) {
 		.attr("y", 0)
 		.attr("width", lobbyWidth)
 		.attr("height", lobbyHeight)
-		.attr("fill", "none")
-		.attr("stroke", "black")
-		.attr("stroke-width", padding/4);
+		.attr("fill", "#fff")
+		.attr("stroke", "#ccc")
+		.attr("stroke-width", sb.fontSize/2);
 
 		var lobbyDoor = lobby
 		.append("line")
-		.attr("x1", (lobbyWidth/2)-(padding*2))
+		.attr("x1", (lobbyWidth/4))
 		.attr("y1", lobbyHeight)
-		.attr("x2", (lobbyWidth/2)+(padding*2))
+		.attr("x2", (lobbyWidth/4)*3)
 		.attr("y2", lobbyHeight)
 		.attr("stroke", "#ffffff")
-		.attr("stroke-width", padding/3);
+		.attr("stroke-width", sb.fontSize/1.5);
 
 		/*var abstain = d.append("rect")
 		.attr("id", "abstain-zone")
@@ -108,6 +116,11 @@ function lobbyHandler (sb) {
 
 			calcLobbyDimens();
 
+			bg
+			.attr("width", sb.w)
+			.attr("height", sb.h)
+
+
 			lobbyGroups
 			.attr("transform", function (d, i) {
 				var x = (padding*(i+1)) + (lobbyWidth*i);
@@ -129,9 +142,9 @@ function lobbyHandler (sb) {
 			.attr("height", lobbyHeight)
 
 			lobbyDoor
-			.attr("x1", (lobbyWidth/2)-(padding*2))
+			.attr("x1", (lobbyWidth/4))
 			.attr("y1", lobbyHeight)
-			.attr("x2", (lobbyWidth/2)+(padding*2))
+			.attr("x2", (lobbyWidth/4)*3)
 			.attr("y2", lobbyHeight)
 
 			/*

@@ -1,6 +1,7 @@
 function loadingHandler (sb) {
 
 	var loading = document.getElementById("loading");
+	var loadCount = 0;
 
 	function INIT () {
 		sb.listen({
@@ -17,10 +18,13 @@ function loadingHandler (sb) {
 
 	function START () {
 		utility.addClass(loading, "active")
+		loadCount++
+		debug.dbg("LoadCount is: "+loadCount)
 	}
 
 	function STOP () {
 		utility.removeClass(loading, "active")
+		loadCount--;
 	}
 	
 
