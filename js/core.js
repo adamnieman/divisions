@@ -1,16 +1,14 @@
 var input = {
 	scripts: [
-	"canvasHandler", //make this work next!!!!! please.
-	"tooltipHandler",
-	"svgHandler",
-	"zoomHandler",
-	//"svgInteractHandler",
+	"billHandler",
+	"voteHandler",
 	"crowdHandler",
-	"crowdFormatHandler",
-	"dropdownHandler",
+	"svgHandler",
+	"lobbyHandler",
+	"loadingHandler",
 	"requestHandler",
-	"constituencyHandler",
 	"resizeHandler",
+	"tooltipHandler",
 	"ready",
 	]
 } 
@@ -84,14 +82,17 @@ function init () {
 	sandBox = {
 		w: document.getElementById("vis").offsetWidth,
 		h: document.getElementById("vis").offsetHeight,
+		lobbies: {
+			aye: {},
+			no: {},
+			abstain: {},
+		},
 		input: input,
 		resize: [],
-		crowds: {
-			offset: {},
-		},
+		multiplier: null,
+		totalMPs: 650,
 		min: 1,
 		max: 5,
-		dataUrlRoot: "http://lda.data.parliament.uk/",
 		fontSize: function () {
 			var text = document.getElementById("test")
 			var fontSize = window.getComputedStyle(test, null).getPropertyValue('font-size');
@@ -101,13 +102,17 @@ function init () {
 		colour: {
 			nonVoters: "#dddddd",
 			//spoiled: "#dddddd",
-			UKIP:  	"#70147A",
-			SNP: "#FFFF00",
-			BNP: "#2e3b74",
-			Green: "#6AB023",
-			Con: "#0087DC",
-			LD: "#FDBB30",
-			Lab: "#DC241f",
+			"UK Independence Party": "#70147A",
+			"Scottish National Party": "#FFFF00",
+			"Green Party": "#6AB023",
+			"Conservative": "#0087DC",
+			"Liberal Democrat": "#FDBB30",
+			"Labour": "#DC241f",
+			"Labour (Co-op)": "#CC0000",
+			"Social Democratic & Labour Party": "#99FF66",
+			"Democratic Unionist Party": "#D46A4C",
+			"Ulster Unionist Party": "#9999FF",
+			"Plaid Cymru": "#008142",
 			other: "#000000",
 		},
 		getColour: function (id) {
@@ -115,7 +120,7 @@ function init () {
 				return this.colour[id];
 			}
 			else { 
-				debug.sentinel(id+" has no assigned colour");
+				debug.log("'"+id+"' has no assigned colour");
 				return this.colour.other 
 			}
 		},

@@ -11,7 +11,7 @@ debug.log = function (string) {
 	console.log("%c[LOG] "+string+"%c"+this.getLine(new Error), "color: #06a800", "color: #bbbbbb");
 }
 
-debug.sentinel = function (string, bool) {
+debug.sentinel = function (bool, string) {
 
 	if (!bool) {
 		console.log("%c[ERROR] "+string+"%c"+this.getLine(new Error), "color: #ff6600", "color: #bbbbbb");
@@ -22,7 +22,7 @@ debug.sentinel = function (string, bool) {
 	}
 }
 
-debug.check = function (string, bool) {
+debug.check = function (bool, string) {
 
 	if (!bool) {
 		throw new Error(string+this.getLine(new Error));

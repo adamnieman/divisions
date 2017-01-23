@@ -4,19 +4,6 @@ html {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     color: #638795;
 }
-#election {
-    height: 4rem;
-}
-
-#vis {
-    position: absolute; 
-    width: 100%;
-    height: calc(100% - 4rem);
-}
-
-canvas, svg {
-    position: absolute;
-}
 
 h1 {
     /*color: #053b50;*/
@@ -26,16 +13,28 @@ h1 {
     margin: 0.5rem;
 }
 
-canvas {
-    pointer-events: none;
-    z-index: 0;
+h2 {
+    font-size: 1.5rem;
+    padding: 0.5rem 0 1.5rem 0;
+    text-transform: uppercase;
 }
 
-svg {
-    /*display: none;
-    pointer-events: all;*/
-    mix-blend-mode: multiply;
-    z-index: 1;
+p {
+    padding: 0.5rem 0 0.75rem 0;
+}
+
+.vertically-centered-wrapper {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.vertically-centered {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    width: 100%;
+    height: 100%;
 }
 
 #tooltip {
@@ -44,8 +43,8 @@ svg {
     padding: 0.5rem;
     width: auto;
     max-width: 25rem;
-    background-color: #ffffff;
-    border: 0.2rem solid #eeeeee;
+    background-color: #ddd;
+    /*border: 0.2rem solid #eeeeee;*/
     visibility: hidden;
     top: 0px;
 }
@@ -56,82 +55,57 @@ svg {
 
 #tooltip p {
     display: block;
+    color: #000;
     font-size: 0.8rem;
+    padding: 0.2rem 0 0 0;
 }
 
-
-
-
-.dropdown-wrapper {
-
-	z-index: 1;
-	float: left;
-    width: 160px;
-    padding: 5px;
-    margin: 0 0 0 0;
-	position: relative;
-    background-color: #638795; /*#053b50*/
-    color: #fff;
-    outline: none;
-    cursor: pointer;
+.bill {
+    border-bottom: 1px solid white;
 }
 
-.dropdown-wrapper span {
+.bill:hover {
+    background-color: #115876;
 }
 
-.dropdown-wrapper:after {
-    content: "";
-    width: 0;
-    height: 0;
+#mother {
+    width: 100%;
+    height: 100%;
+}
+
+#bills {
+    background-color: #11465d;
+    float: left;
+    color: white;
+    height: calc(100% - 2rem);
+    width: calc(30% - 2rem);
+    max-width: 500px;
+    overflow: scroll;
+    padding: 1rem;
+}
+
+#vis {
+    background-color: #fff;
+    min-width: calc(100% - 500px);
+    width: 70%;
+    height: 100%;
+    overflow: hidden;
+    display: inline-block;
+}
+
+#loading {
+    display: none;
+    background-color: rgba(255, 255, 255, 0.8);
     position: absolute;
-    right: 6px;
-    top: 50%;
-    margin-top: -6px;
-    border-width: 6px 0 6px 6px;
-    border-style: solid;
-    border-color: transparent #fff;    
+    min-width: calc(100% - 500px);
+    width: 70%;
+    height: 100%;
 }
 
-.dropdown-wrapper .dropdown {
-	border-radius: 0 0 5px 5px;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0; 
-	padding: 0;
-	margin: 0;
-   text-transform: none;
-    background: #eee;
-    font-weight: normal;
-    opacity: 0;
-    pointer-events: none;
-    max-height: 20rem;
-    overflow-y: scroll;
+#loading.active {
+    display: table;
 }
 
-.dropdown-wrapper .dropdown li {
-    display: block;
-    text-decoration: none;
-    color: #638795;
-    background-color: #eee;
-    padding: 5px 5px 5px 5px;
-}
-
-
-.dropdown-wrapper .dropdown li:hover {
-    background: #dddddd;
-}
-
-.dropdown-wrapper.active .dropdown {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.dropdown-wrapper.active:after {
-    border-color: #fff transparent;
-    border-width: 6px 6px 0 6px ;
-    margin-top: -3px;
-}
 
 #test {
     display: none;
