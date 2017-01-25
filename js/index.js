@@ -6,7 +6,8 @@ var index = {
 
 index.MpDatabase = function (_path) {
 
-	var path = "assets/current-mps-gender.csv"
+	//var path = "assets/current-mps-gender.csv"
+	var path = "assets/current-mps-database-trimmed.csv"
 	var db;
 
 	this.lookup = function (_name) {
@@ -16,10 +17,10 @@ index.MpDatabase = function (_path) {
 		}
 
 		var result = db.filter(function (d, i) {
-			return (d.firstName+" "+d.lastName).toLowerCase() === _name.toLowerCase();
+			return d.fullName.toLowerCase() === _name.toLowerCase();//(d.firstName+" "+d.lastName).toLowerCase() === _name.toLowerCase();
 		})
 
-		if (debug.sentinel(result.length == 1, "No match for MP '"+_name+"' in database.", false)) {
+		if (debug.sentinel(result.length == 1, "No match for MP '"+_name+"' in database.")) {
 			return;
 		}
 
@@ -250,7 +251,6 @@ index.Bill = function (_title, _date) {
 			set = true;
 		}
 
-		console.log(votes)
 	}
 
 	this.setVote = function (_vote) {
@@ -286,6 +286,7 @@ index.Bill = function (_title, _date) {
 	this.isSet = function () {return set;}
 	this.getVotesTotal = function () {return votesTotal;}
 	this.getVotes = function (_result, _i) {
+	
 		if (_result===undefined ||
 			debug.sentinel(votes.hasOwnProperty(_result), "Could not get votes belonging to nonexistant property '"+_result+"'.")) {
 			return votes;

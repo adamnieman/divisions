@@ -17,6 +17,7 @@
 		include "php/stdlib.php";
 
 		$api = new comm_div_api("GET", "http://lda.data.parliament.uk/commonsdivisions.json");
+
 		$comm_divs = $api->getResult();
 
 		$i;

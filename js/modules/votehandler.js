@@ -1,5 +1,5 @@
 function voteHandler (sb) {
-
+	
 	var receiveCount = 0;
 
 

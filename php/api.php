@@ -7,6 +7,7 @@ class api {
 	protected $result;
 
 	function __construct ($method, $url) {
+
 		$this->method = $method;
 		$this->url = $url;
 

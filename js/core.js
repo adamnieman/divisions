@@ -172,10 +172,12 @@ function init () {
 	}
 	var CORE = core(sandBox)
 
+	
 	for (var i = 0; i < sandBox.input.scripts.length; i++) {
 		var script = document.createElement("script")
 		document.head.appendChild(script)
 		script.onload = function () {
+			
 			var fn = eval(sandBox.input.scripts[this.i])
 			CORE.register("mod"+this.i, fn)
 			if (Object.keys(CORE.modules).length === sandBox.input.scripts.length) {
@@ -189,6 +191,7 @@ function init () {
 
 	}
 
+	
 	sandBox.addEvent(window, 'beforeunload', unload)
 
 	function unload () {

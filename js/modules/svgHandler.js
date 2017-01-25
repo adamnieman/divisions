@@ -105,10 +105,10 @@ function svgHandler (sb) {
             	if (!d.vote) return F;
 
             	switch (d.vote.getGender()) {
-            		case "M":
+            		case "Male":
             			return M;
             			break;
-            		case "F":
+            		case "Female":
             			return F;
             			break;
             		default:

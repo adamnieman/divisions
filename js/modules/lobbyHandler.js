@@ -5,6 +5,12 @@ function lobbyHandler (sb) {
 			moduleID: this.moduleID,
 			moduleFunction: "setup",
 		})
+
+		sb.listen({
+			listenFor: ["got-crowds"],
+			moduleID: this.moduleID,
+			moduleFunction: "update",
+		})
 	}
 
 	function SETUP (d) {
@@ -112,6 +118,18 @@ function lobbyHandler (sb) {
 			}
 		}
 
+		function UPDATE () {
+			lobbyLabels
+			.text(function (d) {
+
+				var votes = sb.bill.getVotes(d.toLowerCase())
+				if (votes.hasOwnProperty("count")) {
+					return d+": "+votes.count;
+				}
+				return d;
+			})
+		}
+
 		function RESIZE () {
 
 			calcLobbyDimens();
@@ -162,6 +180,7 @@ function lobbyHandler (sb) {
 		}
 
 		sb.resize.push(RESIZE);
+		this.update = UPDATE;
 		this._destroy = _DESTROY;
 	}
 
