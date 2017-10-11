@@ -1,0 +1,4 @@
+
+# Ignore ios desktop services files
+.DS_Store
+
