@@ -1,8 +1,5 @@
 function crowdHandler (sb) {
 
-	var requested = [];
-	var crowdUrlRoot = "crowd/crowd-call.php?";
-
 	function INIT () {
 		sb.listen({
 			listenFor: ["get-crowds"],
