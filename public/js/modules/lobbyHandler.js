@@ -176,7 +176,7 @@ function lobbyHandler (sb) {
 
 		function _DESTROY () {
 			padding, lobbyWidth, lobbyGroupHeight, lobbyHeight, results = null;
-			lobbyGroups, lobbyLabels, lobby, lobbyBody, lobbyOutline, lobbyDoor, abstain = null;
+			lobbyGroups, lobbyLabels, lobby, /*lobbyBody,*/ lobbyOutline, lobbyDoor, abstain = null;
 		}
 
 		sb.resize.push(RESIZE);
