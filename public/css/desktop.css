@@ -5,6 +5,10 @@ html {
     color: #638795;
 }
 
+body {
+    height: 100%;
+}
+
 h1 {
     /*color: #053b50;*/
     font-size: 3rem;
@@ -17,10 +21,6 @@ h2 {
     font-size: 1.5rem;
     padding: 0.5rem 1rem 1.5rem 1rem;
     text-transform: uppercase;
-}
-
-p {
-    padding: 0.5rem 1rem 0.75rem 1rem;
 }
 
 .vertically-centered-wrapper {
@@ -61,6 +61,18 @@ p {
 }
 
 .bill {
+    border: 0;
+    border-top: 1px solid white;
+    cursor: pointer;
+    background: transparent;
+    padding: 0.5rem 1rem 0.75rem 1rem;
+    color: inherit;
+    font-size: inherit;
+    text-align: inherit;
+    width: 100%;
+}
+
+.bill:last-child {
     border-bottom: 1px solid white;
 }
 
